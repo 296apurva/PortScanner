@@ -1,0 +1,321 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #000d06;
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+h1 {
+    font-size: 2rem;
+    color: #00ff88;
+    text-align: center;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.25rem;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #ff2d78;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+}
+
+.desc {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #00cc6a;
+    margin-bottom: 2rem;
+}
+
+.form-wrap {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+input[type="text"] {
+    background: #000d06;
+    border: 1px solid #00ff88;
+    color: #00ff88;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    width: 260px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+input[type="text"]::placeholder {
+    color: #005c30;
+}
+
+input[type="text"]:focus {
+    border-color: #ff2d78;
+    color: #ff2d78;
+}
+
+button {
+    background: #001a0d;
+    border: 1px solid #ff2d78;
+    color: #ff2d78;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+}
+
+button:hover {
+    background: #3d0020;
+    border-color: #ff80ab;
+    color: #ff80ab;
+}
+
+button.scanning {
+    animation: pulse-btn 1s infinite;
+}
+
+@keyframes pulse-btn {
+    0%, 100% { border-color: #ff2d78; }
+    50% { border-color: #00ff88; }
+}
+
+.progress-wrap {
+    display: none;
+    max-width: 600px;
+    margin: 0 auto 1.5rem;
+}
+
+.progress-label {
+    font-size: 0.72rem;
+    color: #00cc6a;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.progress-label span:last-child {
+    color: #ff2d78;
+}
+
+.progress-bar {
+    height: 4px;
+    background: #001a0d;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00ff88, #ff2d78);
+    width: 0%;
+    transition: width 0.3s;
+}
+
+#status {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #00cc6a;
+    letter-spacing: 0.08em;
+    min-height: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+#status.active {
+    color: #00ff88;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.table-wrap {
+    display: none;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 80px 140px 1fr;
+    gap: 1rem;
+    padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid #ff2d78;
+    margin-bottom: 0.35rem;
+    font-size: 0.7rem;
+    color: #ff2d78;
+    letter-spacing: 0.12em;
+}
+
+.cp-rows {
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.cp-rows::-webkit-scrollbar {
+    width: 4px;
+}
+
+.cp-rows::-webkit-scrollbar-track {
+    background: #000d06;
+}
+
+.cp-rows::-webkit-scrollbar-thumb {
+    background: #00ff88;
+    border-radius: 2px;
+}
+
+.cp-row {
+    display: grid;
+    grid-template-columns: 80px 140px 1fr;
+    gap: 1rem;
+    padding: 0.35rem 0.75rem;
+    border-left: 2px solid #00ff88;
+    margin-bottom: 0.25rem;
+    background: #000f07;
+    border-radius: 0 4px 4px 0;
+    animation: row-in 0.3s ease;
+}
+
+@keyframes row-in {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.cp-row .port { color: #00ff88; font-size: 0.85rem; }
+.cp-row .svc  { color: #ff2d78; font-size: 0.82rem; }
+.cp-row .ban  { color: #00884a; font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+#summary {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #00ff88;
+    letter-spacing: 0.1em;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #00ff8833;
+    display: none;
+}
+
+#summary span {
+    color: #ff2d78;
+}
+
+footer {
+    text-align: center;
+    font-size: 0.7rem;
+    color: #003d1a;
+    letter-spacing: 0.1em;
+    margin-top: 3rem;
+}
+.export-wrap {
+    display: none;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.5rem auto;
+}
+
+.export-btn {
+    background: #000d06;
+    border: 1px solid #00ff88;
+    color: #00ff88;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    padding: 0.4rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+}
+
+.export-btn:hover {
+    background: #003d1a;
+    border-color: #00ff88;
+    color: #00ff88;
+}
+
+.history-wrap {
+    max-width: 700px;
+    margin: 3rem auto 0;
+    border-top: 1px solid #00ff8833;
+    padding-top: 1.5rem;
+}
+
+.history-title {
+    font-size: 0.85rem;
+    color: #ff2d78;
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.history-table-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 100px 100px;
+    gap: 1rem;
+    padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid #ff2d78;
+    margin-bottom: 0.35rem;
+    font-size: 0.7rem;
+    color: #ff2d78;
+    letter-spacing: 0.1em;
+}
+
+.history-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 100px 100px;
+    gap: 1rem;
+    padding: 0.35rem 0.75rem;
+    border-left: 2px solid #ff2d78;
+    margin-bottom: 0.25rem;
+    background: #0d0006;
+    border-radius: 0 4px 4px 0;
+    animation: row-in 0.3s ease;
+}
+
+.history-row .h-ip    { color: #00ff88; font-size: 0.82rem; }
+.history-row .h-time  { color: #00884a; font-size: 0.78rem; }
+.history-row .h-count { color: #ff2d78; font-size: 0.82rem; }
+.history-row .h-export { display: flex; gap: 0.5rem; }
+
+.export-link {
+    color: #00ff88;
+    font-size: 0.75rem;
+    text-decoration: none;
+    border: 1px solid #00ff88;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+
+.export-link:hover { background: #003d1a; }
+.export-link.pink { color: #ff2d78; border-color: #ff2d78; }
+.export-link.pink:hover { background: #3d0020; }
+
+.history-empty {
+    text-align: center;
+    color: #003d1a;
+    font-size: 0.78rem;
+    padding: 1rem;
+    letter-spacing: 0.1em;
+}
+
+.new-row {
+    border-left-color: #00ff88;
+}

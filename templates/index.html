@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Port Scanner</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'port/style.css' %}">
+</head>
+<body>
+    <h1>PORT SCANNER</h1>
+    <p class="subtitle">[ DEMO BUILD — NOT FOR PRODUCTION USE ]</p>
+    <p class="desc">Scans ports 1–1024 for any target IP and streams results in real time.</p>
+
+    <form id="scanForm" class="form-wrap">
+        {% csrf_token %}
+        <input type="text" id="ipInput" placeholder="Enter target IP address" required>
+        <button type="submit" id="scanBtn">SCAN</button>
+    </form>
+
+    <div class="progress-wrap" id="progressWrap">
+        <div class="progress-label">
+            <span id="progressLabel">SCANNING...</span>
+            <span id="progressPct">0%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <div id="status">AWAITING TARGET</div>
+
+    <div class="table-wrap" id="tableWrap">
+        <div class="table-header">
+            <span>PORT</span>
+            <span>SERVICE</span>
+            <span>BANNER</span>
+        </div>
+        <div class="cp-rows" id="rows"></div>
+    </div>
+
+    <div id="summary"></div>
+
+    <div class="export-wrap" id="exportWrap">
+        <button class="export-btn" id="exportJson">EXPORT JSON</button>
+        <button class="export-btn" id="exportCsv">EXPORT CSV</button>
+    </div>
+
+    <div class="history-wrap">
+        <h2 class="history-title">SCAN HISTORY</h2>
+        <div class="history-table-header">
+            <span>TARGET IP</span>
+            <span>SCANNED AT</span>
+            <span>OPEN PORTS</span>
+            <span>EXPORT</span>
+        </div>
+        <div id="historyRows">
+            {% for scan in history %}
+            <div class="history-row">
+                <span class="h-ip">{{ scan.target_ip }}</span>
+                <span class="h-time">{{ scan.scanned_at|date:"Y-m-d H:i" }}</span>
+                <span class="h-count">{{ scan.open_ports_count }}</span>
+                <span class="h-export">
+                    <a href="/export/json/{{ scan.id }}/" class="export-link">JSON</a>
+                    <a href="/export/csv/{{ scan.id }}/" class="export-link pink">CSV</a>
+                </span>
+            </div>
+            {% empty %}
+            <div class="history-empty">NO SCANS YET</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <footer>THANK YOU FOR TESTING</footer>
+
+    <script>
+        let evtSource = null, portCount = 0, openCount = 0, currentScanId = null;
+
+        document.getElementById('scanForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const ip = document.getElementById('ipInput').value.trim();
+            if (!ip) return;
+
+            if (evtSource) { evtSource.close(); evtSource = null; }
+
+            portCount = 0; openCount = 0; currentScanId = null;
+            document.getElementById('rows').innerHTML = '';
+            document.getElementById('summary').style.display = 'none';
+            document.getElementById('tableWrap').style.display = 'none';
+            document.getElementById('exportWrap').style.display = 'none';
+            document.getElementById('progressWrap').style.display = 'block';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressPct').textContent = '0%';
+            document.getElementById('progressLabel').textContent = 'SCANNING...';
+
+            const status = document.getElementById('status');
+            status.textContent = 'INITIALIZING SCAN...';
+            status.className = 'active';
+
+            const btn = document.getElementById('scanBtn');
+            btn.textContent = 'SCANNING';
+            btn.className = 'scanning';
+
+            evtSource = new EventSource(`/scan/?ip=${encodeURIComponent(ip)}`);
+
+            evtSource.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                portCount++;
+                const pct = Math.min(Math.round((portCount / 1024) * 100), 100);
+                document.getElementById('progressFill').style.width = pct + '%';
+                document.getElementById('progressPct').textContent = pct + '%';
+                status.textContent = `SCANNING PORT ${portCount} / 1024`;
+
+                if (data.type === 'open_port') {
+                    openCount++;
+                    document.getElementById('tableWrap').style.display = 'block';
+                    const row = document.createElement('div');
+                    row.className = 'cp-row';
+                    row.innerHTML = `<span class="port">${data.port}</span><span class="svc">${data.service || 'unknown'}</span><span class="ban">${data.banner || '—'}</span>`;
+                    document.getElementById('rows').appendChild(row);
+                }
+
+                if (data.type === 'summary') {
+                    currentScanId = data.scan_id;
+                    status.textContent = 'SCAN COMPLETE';
+                    status.className = '';
+                    btn.textContent = 'SCAN';
+                    btn.className = '';
+                    document.getElementById('progressFill').style.width = '100%';
+                    document.getElementById('progressPct').textContent = '100%';
+                    document.getElementById('progressLabel').textContent = 'COMPLETE';
+
+                    const sum = document.getElementById('summary');
+                    sum.innerHTML = `[ <span>${openCount} OPEN PORT${openCount !== 1 ? 'S' : ''}</span> FOUND ON ${ip} ]`;
+                    sum.style.display = 'block';
+
+                    // Show export buttons
+                    document.getElementById('exportWrap').style.display = 'flex';
+                    document.getElementById('exportJson').onclick = () => window.location = `/export/json/${currentScanId}/`;
+                    document.getElementById('exportCsv').onclick = () => window.location = `/export/csv/${currentScanId}/`;
+
+                    // Add to history at top
+                    const historyRows = document.getElementById('historyRows');
+                    const empty = historyRows.querySelector('.history-empty');
+                    if (empty) empty.remove();
+
+                    const newRow = document.createElement('div');
+                    newRow.className = 'history-row new-row';
+                    const now = new Date();
+                    const formatted = now.getFullYear() + '-' +
+                        String(now.getMonth()+1).padStart(2,'0') + '-' +
+                        String(now.getDate()).padStart(2,'0') + ' ' +
+                        String(now.getHours()).padStart(2,'0') + ':' +
+                        String(now.getMinutes()).padStart(2,'0');
+                    newRow.innerHTML = `
+                        <span class="h-ip">${ip}</span>
+                        <span class="h-time">${formatted}</span>
+                        <span class="h-count">${openCount}</span>
+                        <span class="h-export">
+                            <a href="/export/json/${currentScanId}/" class="export-link">JSON</a>
+                            <a href="/export/csv/${currentScanId}/" class="export-link pink">CSV</a>
+                        </span>`;
+                    historyRows.insertBefore(newRow, historyRows.firstChild);
+                    evtSource.close();
+                }
+
+                if (data.type === 'error') {
+                    status.textContent = `ERROR: ${data.message}`;
+                    status.className = '';
+                    btn.textContent = 'SCAN';
+                    btn.className = '';
+                    evtSource.close();
+                }
+            };
+
+            evtSource.onerror = function() {
+                status.textContent = 'CONNECTION LOST';
+                status.className = '';
+                btn.textContent = 'SCAN';
+                btn.className = '';
+                evtSource.close(); status.toggleAttribute('disabled
+            }
+        });
+    </script>
+</body>
+</html>
