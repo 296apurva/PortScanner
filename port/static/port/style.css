@@ -45,7 +45,7 @@ h1 {
 
 input[type="text"] {
     background: #000d06;
-    border: 1px solid #00ff88;
+    border: 1px solid #00f888;
     color: #00ff88;
     font-family: 'Share Tech Mono', monospace;
     font-size: 0.9rem;
@@ -67,7 +67,7 @@ input[type="text"]:focus {
 
 button {
     background: #001a0d;
-    border: 1px solid #ff2d78;
+    border: 1px solid #ff2d2d;
     color: #ff2d78;
     font-family: 'Share Tech Mono', monospace;
     font-size: 0.9rem;

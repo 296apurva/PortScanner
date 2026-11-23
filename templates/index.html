@@ -85,9 +85,9 @@
 
             portCount = 0; openCount = 0; currentScanId = null;
             document.getElementById('rows').innerHTML = '';
-            document.getElementById('summary').style.display = 'none';
+            document.getAnimations().forEach(anim => anim.cancel());
             document.getElementById('tableWrap').style.display = 'none';
-            document.getElementById('exportWrap').style.display = 'none';
+            document.getElementById('summary').style.display = 'none';
             document.getElementById('progressWrap').style.display = 'block';
             document.getElementById('progressFill').style.width = '0%';
             document.getElementById('progressPct').textContent = '0%';
@@ -95,7 +95,7 @@
 
             const status = document.getElementById('status');
             status.textContent = 'INITIALIZING SCAN...';
-            status.className = 'active';
+            status.className = 'Scanning';
 
             const btn = document.getElementById('scanBtn');
             btn.textContent = 'SCANNING';
@@ -174,12 +174,12 @@
             };
 
             evtSource.onerror = function() {
-                status.textContent = 'CONNECTION LOST';
-                status.className = '';
+                status.textContent = 'ERROR: CONNECTION LOST';
+                status.className = 'error';
                 btn.textContent = 'SCAN';
                 btn.className = '';
-                evtSource.close(); status.toggleAttribute('disabled
-            }
+                evtSource.close();
+            };
         });
     </script>
 </body>
