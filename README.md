@@ -7,7 +7,7 @@ A web-based port scanner built with **Django** and **Python** that scans TCP por
 ## Demo / Screenshot
 
 ![Port Scanner scanning Metasploitable target 192.168.56.102](screenshots/scans.png)
-![Port Scanner from terminal 192.168.56.101](screenshots/scans.png)
+![Port Scanner from terminal 192.168.56.101](screenshots/terminal.png)
 
 ## About the Demo
 
